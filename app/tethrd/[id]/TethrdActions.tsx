@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { Tethrd } from "@/lib/types";
@@ -11,26 +11,54 @@ export default function TethrdActions({
   isCreator,
   isJoiner,
   canJoin,
+  paymentSuccess,
 }: {
   tethrd: Tethrd;
   userId: string | null;
   isCreator: boolean;
   isJoiner: boolean;
   canJoin: boolean;
+  paymentSuccess: boolean;
 }) {
   const router = useRouter();
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const post = async (action: "join" | "confirm") => {
+  // After returning from Stripe, auto-refresh to pick up webhook update
+  useEffect(() => {
+    if (!paymentSuccess) return;
+    const timer = setTimeout(() => router.refresh(), 2500);
+    return () => clearTimeout(timer);
+  }, [paymentSuccess, router]);
+
+  const joinWithPayment = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tethrd_id: tethrd.id }),
+      });
+      if (!res.ok) throw new Error("Failed to create checkout");
+      const { url } = await res.json();
+      window.location.href = url;
+    } catch {
+      setError("Something went wrong. Please try again.");
+      setLoading(false);
+    }
+  };
+
+  const confirm = async () => {
     setLoading(true);
     setError(null);
     try {
       const res = await fetch(`/api/tethrd/${tethrd.id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action }),
+        body: JSON.stringify({ action: "confirm" }),
       });
       if (!res.ok) throw new Error("Action failed");
       router.refresh();
@@ -69,7 +97,12 @@ export default function TethrdActions({
 
   return (
     <div className="space-y-4">
-      {/* Share link — always visible */}
+      {paymentSuccess && tethrd.status === "pending" && (
+        <div className="bg-indigo-50 border border-indigo-200 rounded-xl px-5 py-4 text-indigo-700 text-sm">
+          Payment received — activating tethrd...
+        </div>
+      )}
+
       {isCreator && tethrd.status === "pending" && (
         <div className="bg-slate-50 border border-slate-200 rounded-xl px-5 py-4">
           <p className="text-xs text-slate-500 mb-2 font-medium">Share this link with the other party</p>
@@ -85,30 +118,30 @@ export default function TethrdActions({
         </div>
       )}
 
-      {canJoin && (
+      {canJoin && userId && (
         <button
-          onClick={() => post("join")}
+          onClick={joinWithPayment}
           disabled={loading}
           className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-xl text-sm transition-colors disabled:opacity-50"
         >
-          {loading ? "Joining..." : "Join this tethrd"}
+          {loading ? "Redirecting to payment..." : "Tethr and Pay →"}
         </button>
+      )}
+
+      {canJoin && !userId && (
+        <p className="text-sm text-slate-500 text-center">
+          <Link href="/sign-in" className="text-indigo-600 font-medium">Sign in</Link> to join this tethrd.
+        </p>
       )}
 
       {canConfirm && (
         <button
-          onClick={() => post("confirm")}
+          onClick={confirm}
           disabled={loading}
           className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-xl text-sm transition-colors disabled:opacity-50"
         >
           {loading ? "Confirming..." : "Confirm — deal is done ✓"}
         </button>
-      )}
-
-      {!userId && canJoin && (
-        <p className="text-sm text-slate-500 text-center">
-          <Link href="/sign-in" className="text-indigo-600 font-medium">Sign in</Link> to join this tethrd.
-        </p>
       )}
 
       {error && <p className="text-red-500 text-sm">{error}</p>}

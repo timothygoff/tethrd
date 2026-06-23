@@ -4,8 +4,15 @@ import { notFound } from "next/navigation";
 import TethrdActions from "./TethrdActions";
 import { SCENARIO_LABELS, type Tethrd } from "@/lib/types";
 
-export default async function TethrdPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function TethrdPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ payment?: string }>;
+}) {
   const { id } = await params;
+  const { payment } = await searchParams;
   const { userId } = await auth();
 
   const { data: tethrd, error } = await supabase
@@ -81,6 +88,7 @@ export default async function TethrdPage({ params }: { params: Promise<{ id: str
           isCreator={isCreator}
           isJoiner={isJoiner}
           canJoin={canJoin}
+          paymentSuccess={payment === "success"}
         />
       </section>
     </main>

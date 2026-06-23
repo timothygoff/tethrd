@@ -14,6 +14,7 @@ export interface Tethrd {
   joiner_id: string | null;
   joiner_confirmed: boolean;
   expires_at: string | null;
+  payment_intent_id: string | null;
   created_at: string;
 }
 
