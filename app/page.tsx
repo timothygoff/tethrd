@@ -5,11 +5,15 @@ import { useState } from "react";
 function WaitlistForm({
   email,
   submitted,
+  loading,
+  error,
   onEmailChange,
   onSubmit,
 }: {
   email: string;
   submitted: boolean;
+  loading: boolean;
+  error: string | null;
   onEmailChange: (v: string) => void;
   onSubmit: (e: React.FormEvent) => void;
 }) {
@@ -21,33 +25,54 @@ function WaitlistForm({
     );
   }
   return (
-    <form onSubmit={onSubmit} className="flex flex-col sm:flex-row gap-3 w-full max-w-md mx-auto justify-center">
-      <input
-        type="email"
-        required
-        placeholder="your@email.com"
-        value={email}
-        onChange={(e) => onEmailChange(e.target.value)}
-        className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 transition-colors shadow-sm"
-      />
-      <button
-        type="submit"
-        className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-xl text-sm transition-colors whitespace-nowrap shadow-sm"
-      >
-        Get Early Access
-      </button>
-    </form>
+    <div className="w-full max-w-md mx-auto">
+      <form onSubmit={onSubmit} className="flex flex-col sm:flex-row gap-3">
+        <input
+          type="email"
+          required
+          placeholder="your@email.com"
+          value={email}
+          onChange={(e) => onEmailChange(e.target.value)}
+          disabled={loading}
+          className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 transition-colors shadow-sm disabled:opacity-50"
+        />
+        <button
+          type="submit"
+          disabled={loading}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-xl text-sm transition-colors whitespace-nowrap shadow-sm disabled:opacity-50"
+        >
+          {loading ? "Saving..." : "Get Early Access"}
+        </button>
+      </form>
+      {error && <p className="text-red-500 text-xs mt-2 text-center">{error}</p>}
+    </div>
   );
 }
 
 export default function Home() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setEmail("");
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/waitlist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) throw new Error("Failed");
+      setSubmitted(true);
+      setEmail("");
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -72,7 +97,7 @@ export default function Home() {
           tethrd holds funds securely between two people until both sides confirm the deal is done. No agreement? Timer expires and everyone gets their money back — automatically.
         </p>
 
-        <WaitlistForm email={email} submitted={submitted} onEmailChange={setEmail} onSubmit={handleSubmit} />
+        <WaitlistForm email={email} submitted={submitted} loading={loading} error={error} onEmailChange={setEmail} onSubmit={handleSubmit} />
       </section>
 
       {/* How it works */}
@@ -147,7 +172,7 @@ export default function Home() {
         <p className="text-slate-500 mb-8 text-sm leading-relaxed">
           Flat fee per transaction. Both parties protected. Launch coming soon — get early access now.
         </p>
-        <WaitlistForm email={email} submitted={submitted} onEmailChange={setEmail} onSubmit={handleSubmit} />
+        <WaitlistForm email={email} submitted={submitted} loading={loading} error={error} onEmailChange={setEmail} onSubmit={handleSubmit} />
       </section>
 
       {/* Footer */}
