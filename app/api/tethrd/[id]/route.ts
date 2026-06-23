@@ -34,40 +34,59 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const isCreator = userId === t.creator_id;
     const isJoiner = userId === t.joiner_id;
     if (!isCreator && !isJoiner) return NextResponse.json({ error: "Not a participant" }, { status: 403 });
+    if (t.status !== "active") return NextResponse.json({ error: "Cannot confirm at this stage" }, { status: 400 });
 
-    const update: Partial<Tethrd> = isCreator
-      ? { creator_confirmed: true }
-      : { joiner_confirmed: true };
+    // Step 1: Set this party's confirmation flag
+    const flagUpdate = isCreator ? { creator_confirmed: true } : { joiner_confirmed: true };
+    await getSupabase().from("tethrds").update(flagUpdate).eq("id", id);
 
-    const bothConfirmed =
-      (isCreator && t.joiner_confirmed) || (isJoiner && t.creator_confirmed);
+    // Step 2: Atomically claim the capture — only one concurrent request can win this
+    // The DB transitions active → capturing only if both flags are now true
+    const { data: claimed } = await getSupabase()
+      .from("tethrds")
+      .update({ status: "capturing" })
+      .eq("id", id)
+      .eq("status", "active")
+      .eq("creator_confirmed", true)
+      .eq("joiner_confirmed", true)
+      .select("id");
 
-    if (bothConfirmed) {
-      update.status = "confirmed";
-      if (t.payment_intent_id) {
-        await getStripe().paymentIntents.capture(t.payment_intent_id);
-      }
-
-      // Notify both parties
-      const [creatorEmail, joinerEmail, creatorUsername, joinerUsername] = await Promise.all([
-        getUserEmail(t.creator_id),
-        t.joiner_id ? getUserEmail(t.joiner_id) : Promise.resolve(null),
-        getUsername(t.creator_id),
-        t.joiner_id ? getUsername(t.joiner_id) : Promise.resolve("Joiner"),
-      ]);
-
-      const confirmedHtml = (name: string) =>
-        `<p>Hi @${name},</p>
-        <p>Both parties have confirmed "<strong>${t.description}</strong>". Funds of <strong>$${t.amount}</strong> have been released.</p>
-        <p><a href="https://www.tethrd.io/tethrd/${id}">View your tethrd →</a></p>`;
-
-      await Promise.all([
-        creatorEmail ? sendEmail(creatorEmail, "Tethrd confirmed — funds released", confirmedHtml(creatorUsername)) : null,
-        joinerEmail ? sendEmail(joinerEmail, "Tethrd confirmed — funds released", confirmedHtml(joinerUsername)) : null,
-      ]);
+    if (!claimed || claimed.length === 0) {
+      // Not both confirmed yet, or another request already claimed it — nothing to do
+      return NextResponse.json({ ok: true });
     }
 
-    await getSupabase().from("tethrds").update(update).eq("id", id);
+    // Step 3: Capture the payment — we're the only request that will reach this
+    if (t.payment_intent_id) {
+      try {
+        await getStripe().paymentIntents.capture(t.payment_intent_id);
+      } catch {
+        // Status stays "capturing" so it can be investigated and retried manually
+        return NextResponse.json({ error: "Payment capture failed. Please contact support." }, { status: 500 });
+      }
+    }
+
+    // Step 4: Mark confirmed
+    await getSupabase().from("tethrds").update({ status: "confirmed" }).eq("id", id);
+
+    // Step 5: Notify both parties
+    const [creatorEmail, joinerEmail, creatorUsername, joinerUsername] = await Promise.all([
+      getUserEmail(t.creator_id),
+      t.joiner_id ? getUserEmail(t.joiner_id) : Promise.resolve(null),
+      getUsername(t.creator_id),
+      t.joiner_id ? getUsername(t.joiner_id) : Promise.resolve("Joiner"),
+    ]);
+
+    const confirmedHtml = (name: string) =>
+      `<p>Hi @${name},</p>
+      <p>Both parties have confirmed "<strong>${t.description}</strong>". Funds of <strong>$${t.amount}</strong> have been released.</p>
+      <p><a href="https://www.tethrd.io/tethrd/${id}">View your tethrd →</a></p>`;
+
+    await Promise.all([
+      creatorEmail ? sendEmail(creatorEmail, "Tethrd confirmed — funds released", confirmedHtml(creatorUsername)) : null,
+      joinerEmail ? sendEmail(joinerEmail, "Tethrd confirmed — funds released", confirmedHtml(joinerUsername)) : null,
+    ]);
+
     return NextResponse.json({ ok: true });
   }
 

@@ -1,5 +1,5 @@
 export type Scenario = "commitment_hold" | "full_escrow" | "service_payment";
-export type TethrdStatus = "pending" | "active" | "confirmed" | "expired" | "cancelled";
+export type TethrdStatus = "pending" | "active" | "capturing" | "confirmed" | "expired" | "cancelled";
 
 export interface Tethrd {
   id: string;
