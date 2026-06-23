@@ -41,7 +41,7 @@ export default function TethrdActions({
   };
 
   const copyLink = () => {
-    navigator.clipboard.writeText(window.location.href);
+    navigator.clipboard.writeText(`https://www.tethrd.io/tethrd/${tethrd.id}`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -73,7 +73,7 @@ export default function TethrdActions({
         <div className="bg-slate-50 border border-slate-200 rounded-xl px-5 py-4">
           <p className="text-xs text-slate-500 mb-2 font-medium">Share this link with the other party</p>
           <div className="flex items-center gap-3">
-            <p className="text-sm text-slate-700 truncate flex-1 font-mono">{typeof window !== "undefined" ? window.location.href : ""}</p>
+            <p className="text-sm text-slate-700 truncate flex-1 font-mono">{`https://www.tethrd.io/tethrd/${tethrd.id}`}</p>
             <button
               onClick={copyLink}
               className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 whitespace-nowrap"
