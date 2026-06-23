@@ -2,6 +2,44 @@
 
 import { useState } from "react";
 
+function WaitlistForm({
+  email,
+  submitted,
+  onEmailChange,
+  onSubmit,
+}: {
+  email: string;
+  submitted: boolean;
+  onEmailChange: (v: string) => void;
+  onSubmit: (e: React.FormEvent) => void;
+}) {
+  if (submitted) {
+    return (
+      <div className="bg-indigo-50 border border-indigo-200 rounded-xl px-8 py-5 text-indigo-600 text-sm font-medium inline-block">
+        You&apos;re on the list. We&apos;ll be in touch.
+      </div>
+    );
+  }
+  return (
+    <form onSubmit={onSubmit} className="flex flex-col sm:flex-row gap-3 w-full max-w-md mx-auto justify-center">
+      <input
+        type="email"
+        required
+        placeholder="your@email.com"
+        value={email}
+        onChange={(e) => onEmailChange(e.target.value)}
+        className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 transition-colors shadow-sm"
+      />
+      <button
+        type="submit"
+        className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-xl text-sm transition-colors whitespace-nowrap shadow-sm"
+      >
+        Get Early Access
+      </button>
+    </form>
+  );
+}
+
 export default function Home() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -34,28 +72,7 @@ export default function Home() {
           tethrd holds funds securely between two people until both sides confirm the deal is done. No agreement? Timer expires and everyone gets their money back — automatically.
         </p>
 
-        {submitted ? (
-          <div className="bg-indigo-50 border border-indigo-200 rounded-xl px-8 py-5 text-indigo-600 text-sm font-medium">
-            You&apos;re on the list. We&apos;ll be in touch.
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 w-full max-w-md">
-            <input
-              type="email"
-              required
-              placeholder="your@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 transition-colors shadow-sm"
-            />
-            <button
-              type="submit"
-              className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-xl text-sm transition-colors whitespace-nowrap shadow-sm"
-            >
-              Get Early Access
-            </button>
-          </form>
-        )}
+        <WaitlistForm email={email} submitted={submitted} onEmailChange={setEmail} onSubmit={handleSubmit} />
       </section>
 
       {/* How it works */}
@@ -130,28 +147,7 @@ export default function Home() {
         <p className="text-slate-500 mb-8 text-sm leading-relaxed">
           Flat fee per transaction. Both parties protected. Launch coming soon — get early access now.
         </p>
-        {submitted ? (
-          <div className="bg-indigo-50 border border-indigo-200 rounded-xl px-8 py-5 text-indigo-600 text-sm font-medium inline-block">
-            You&apos;re on the list. We&apos;ll be in touch.
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
-            <input
-              type="email"
-              required
-              placeholder="your@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 transition-colors shadow-sm"
-            />
-            <button
-              type="submit"
-              className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-xl text-sm transition-colors whitespace-nowrap shadow-sm"
-            >
-              Get Early Access
-            </button>
-          </form>
-        )}
+        <WaitlistForm email={email} submitted={submitted} onEmailChange={setEmail} onSubmit={handleSubmit} />
       </section>
 
       {/* Footer */}
