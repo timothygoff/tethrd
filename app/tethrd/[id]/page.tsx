@@ -1,8 +1,18 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 import { supabase } from "@/lib/supabase";
 import { notFound } from "next/navigation";
 import TethrdActions from "./TethrdActions";
 import { SCENARIO_LABELS, type Tethrd } from "@/lib/types";
+
+async function getUsername(userId: string): Promise<string> {
+  try {
+    const client = await clerkClient();
+    const user = await client.users.getUser(userId);
+    return user.username ?? user.firstName ?? "Unknown";
+  } catch {
+    return "Unknown";
+  }
+}
 
 export default async function TethrdPage({
   params,
@@ -27,6 +37,11 @@ export default async function TethrdPage({
   const isCreator = userId === t.creator_id;
   const isJoiner = userId === t.joiner_id;
   const canJoin = !isCreator && !t.joiner_id && t.status === "pending";
+
+  const [creatorUsername, joinerUsername] = await Promise.all([
+    getUsername(t.creator_id),
+    t.joiner_id ? getUsername(t.joiner_id) : Promise.resolve(null),
+  ]);
 
   return (
     <main className="min-h-screen bg-white text-slate-900">
@@ -70,13 +85,13 @@ export default async function TethrdPage({
             <div className="flex items-center gap-2">
               <div className={`w-3 h-3 rounded-full ${t.creator_confirmed ? "bg-green-500" : "bg-slate-200"}`} />
               <span className="text-sm text-slate-600">
-                Creator {t.creator_confirmed ? "confirmed ✓" : "pending"}
+                @{creatorUsername} {t.creator_confirmed ? "confirmed ✓" : "pending"}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <div className={`w-3 h-3 rounded-full ${t.joiner_confirmed ? "bg-green-500" : "bg-slate-200"}`} />
               <span className="text-sm text-slate-600">
-                {t.joiner_id ? (t.joiner_confirmed ? "Joiner confirmed ✓" : "Joiner pending") : "Waiting for second party"}
+                {joinerUsername ? `@${joinerUsername} ${t.joiner_confirmed ? "confirmed ✓" : "pending"}` : "Waiting for second party"}
               </span>
             </div>
           </div>
