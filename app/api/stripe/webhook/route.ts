@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
 import { getSupabase } from "@/lib/supabase";
+import { getUserEmail, getUsername } from "@/lib/clerk";
+import { sendEmail } from "@/lib/resend";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -25,12 +27,11 @@ export async function POST(req: NextRequest) {
 
     const { data: t } = await getSupabase()
       .from("tethrds")
-      .select("timer_hours, status")
+      .select("timer_hours, status, creator_id, description, amount")
       .eq("id", tethrd_id)
       .single();
 
     if (!t || t.status !== "pending") {
-      // Already processed or not found — idempotent OK
       return NextResponse.json({ ok: true });
     }
 
@@ -41,6 +42,23 @@ export async function POST(req: NextRequest) {
       .update({ joiner_id: joiner_user_id, status: "active", payment_intent_id, expires_at })
       .eq("id", tethrd_id)
       .eq("status", "pending");
+
+    // Notify creator that someone joined
+    const [creatorEmail, joinerUsername] = await Promise.all([
+      getUserEmail(t.creator_id),
+      getUsername(joiner_user_id),
+    ]);
+
+    if (creatorEmail) {
+      await sendEmail(
+        creatorEmail,
+        "Someone joined your tethrd",
+        `<p>Hi,</p>
+        <p><strong>@${joinerUsername}</strong> has joined your tethrd "<strong>${t.description}</strong>" and paid $${t.amount}.</p>
+        <p>Once both of you confirm the deal is done, funds will be released.</p>
+        <p><a href="https://www.tethrd.io/tethrd/${tethrd_id}">View your tethrd →</a></p>`
+      );
+    }
   }
 
   return NextResponse.json({ ok: true });
