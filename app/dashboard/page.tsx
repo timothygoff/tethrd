@@ -7,11 +7,14 @@ import { SCENARIO_LABELS, type Tethrd } from "@/lib/types";
 export default async function Dashboard() {
   const { userId } = await auth();
 
-  const { data: tethrds } = await getSupabase()
-    .from("tethrds")
-    .select("*")
-    .or(`creator_id.eq.${userId},joiner_id.eq.${userId}`)
-    .order("created_at", { ascending: false });
+  const [{ data: created }, { data: joined }] = await Promise.all([
+    getSupabase().from("tethrds").select("*").eq("creator_id", userId),
+    getSupabase().from("tethrds").select("*").eq("joiner_id", userId),
+  ]);
+
+  const tethrds = [...(created ?? []), ...(joined ?? [])].sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
 
   return (
     <main className="min-h-screen bg-white text-slate-900">
