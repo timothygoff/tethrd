@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { supabase } from "@/lib/supabase";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 import { SCENARIO_LABELS, type Tethrd } from "@/lib/types";
 
 export async function POST(req: NextRequest) {
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
 
   const origin = req.headers.get("origin") ?? "https://www.tethrd.io";
 
-  const session = await stripe.checkout.sessions.create({
+  const session = await getStripe().checkout.sessions.create({
     mode: "payment",
     payment_intent_data: {
       capture_method: "manual",

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { supabase } from "@/lib/supabase";
-import { stripe } from "@/lib/stripe";
+import { getStripe } from "@/lib/stripe";
 import type { Tethrd } from "@/lib/types";
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -43,7 +43,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (bothConfirmed) {
       update.status = "confirmed";
       if (t.payment_intent_id) {
-        await stripe.paymentIntents.capture(t.payment_intent_id);
+        await getStripe().paymentIntents.capture(t.payment_intent_id);
       }
     }
 
