@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 import { getStripe } from "@/lib/stripe";
 import { SCENARIO_LABELS, type Tethrd } from "@/lib/types";
 
@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
 
   const { tethrd_id } = await req.json();
 
-  const { data, error } = await supabase.from("tethrds").select("*").eq("id", tethrd_id).single();
+  const { data, error } = await getSupabase().from("tethrds").select("*").eq("id", tethrd_id).single();
   if (error || !data) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const t = data as Tethrd;

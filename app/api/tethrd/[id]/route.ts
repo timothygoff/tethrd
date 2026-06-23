@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 import { getStripe } from "@/lib/stripe";
 import type { Tethrd } from "@/lib/types";
 
@@ -11,7 +11,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const { action } = await req.json();
 
-  const { data, error } = await supabase.from("tethrds").select("*").eq("id", id).single();
+  const { data, error } = await getSupabase().from("tethrds").select("*").eq("id", id).single();
   if (error || !data) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const t = data as Tethrd;
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: "Cannot join your own tethrd" }, { status: 400 });
     }
     const expires_at = new Date(Date.now() + t.timer_hours * 60 * 60 * 1000).toISOString();
-    await supabase.from("tethrds").update({ joiner_id: userId, status: "active", expires_at }).eq("id", id);
+    await getSupabase().from("tethrds").update({ joiner_id: userId, status: "active", expires_at }).eq("id", id);
     return NextResponse.json({ ok: true });
   }
 
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       }
     }
 
-    await supabase.from("tethrds").update(update).eq("id", id);
+    await getSupabase().from("tethrds").update(update).eq("id", id);
     return NextResponse.json({ ok: true });
   }
 

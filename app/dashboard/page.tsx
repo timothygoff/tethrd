@@ -1,13 +1,13 @@
 import { UserButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 import Link from "next/link";
 import { SCENARIO_LABELS, type Tethrd } from "@/lib/types";
 
 export default async function Dashboard() {
   const { userId } = await auth();
 
-  const { data: tethrds } = await supabase
+  const { data: tethrds } = await getSupabase()
     .from("tethrds")
     .select("*")
     .or(`creator_id.eq.${userId},joiner_id.eq.${userId}`)

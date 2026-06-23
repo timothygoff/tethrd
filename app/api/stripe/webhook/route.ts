@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getStripe } from "@/lib/stripe";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing metadata" }, { status: 400 });
     }
 
-    const { data: t } = await supabase
+    const { data: t } = await getSupabase()
       .from("tethrds")
       .select("timer_hours, status")
       .eq("id", tethrd_id)
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
 
     const expires_at = new Date(Date.now() + t.timer_hours * 60 * 60 * 1000).toISOString();
 
-    await supabase
+    await getSupabase()
       .from("tethrds")
       .update({ joiner_id: joiner_user_id, status: "active", payment_intent_id, expires_at })
       .eq("id", tethrd_id)

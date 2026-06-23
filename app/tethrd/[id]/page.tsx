@@ -1,5 +1,5 @@
 import { auth, clerkClient } from "@clerk/nextjs/server";
-import { supabase } from "@/lib/supabase";
+import { getSupabase } from "@/lib/supabase";
 import { notFound } from "next/navigation";
 import TethrdActions from "./TethrdActions";
 import { SCENARIO_LABELS, type Tethrd } from "@/lib/types";
@@ -25,7 +25,7 @@ export default async function TethrdPage({
   const { payment } = await searchParams;
   const { userId } = await auth();
 
-  const { data: tethrd, error } = await supabase
+  const { data: tethrd, error } = await getSupabase()
     .from("tethrds")
     .select("*")
     .eq("id", id)
