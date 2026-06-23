@@ -11,30 +11,67 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const now = new Date().toISOString();
+  const now = new Date();
+  const fifteenMinutesFromNow = new Date(now.getTime() + 15 * 60 * 1000);
+  const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000);
 
-  const { data: expired, error } = await getSupabase()
+  // Pass 1: send warning to tethrds expiring within 15 minutes
+  const { data: toWarn } = await getSupabase()
     .from("tethrds")
     .select("*")
     .in("status", ["pending", "active"])
-    .lt("deadline", now);
+    .eq("warning_sent", false)
+    .lte("deadline", fifteenMinutesFromNow.toISOString())
+    .gt("deadline", fiveMinutesAgo.toISOString());
 
-  if (error) {
-    return NextResponse.json({ error: "DB query failed" }, { status: 500 });
-  }
+  // Pass 2: expire tethrds past deadline + 5 min grace
+  const { data: toExpire } = await getSupabase()
+    .from("tethrds")
+    .select("*")
+    .in("status", ["pending", "active"])
+    .lt("deadline", fiveMinutesAgo.toISOString());
 
-  if (!expired || expired.length === 0) {
-    return NextResponse.json({ expired: 0 });
-  }
-
-  const results = await Promise.allSettled(
-    expired.map((row) => expireTethrd(row as Tethrd))
+  const warnResults = await Promise.allSettled(
+    (toWarn ?? []).map((row) => warnTethrd(row as Tethrd))
   );
 
-  const succeeded = results.filter((r) => r.status === "fulfilled").length;
-  const failed = results.filter((r) => r.status === "rejected").length;
+  const expireResults = await Promise.allSettled(
+    (toExpire ?? []).map((row) => expireTethrd(row as Tethrd))
+  );
 
-  return NextResponse.json({ expired: succeeded, failed });
+  return NextResponse.json({
+    warned: warnResults.filter((r) => r.status === "fulfilled").length,
+    expired: expireResults.filter((r) => r.status === "fulfilled").length,
+  });
+}
+
+async function warnTethrd(t: Tethrd) {
+  await getSupabase()
+    .from("tethrds")
+    .update({ warning_sent: true })
+    .eq("id", t.id);
+
+  const [creatorEmail, joinerEmail, creatorUsername, joinerUsername] =
+    await Promise.all([
+      getUserEmail(t.creator_id),
+      t.joiner_id ? getUserEmail(t.joiner_id) : Promise.resolve(null),
+      getUsername(t.creator_id),
+      t.joiner_id ? getUsername(t.joiner_id) : Promise.resolve(null),
+    ]);
+
+  const warningHtml = (name: string) =>
+    `<p>Hi @${name},</p>
+    <p>Your tethrd "<strong>${t.description}</strong>" expires in 15 minutes. If both parties don't confirm before then, any held funds will be returned automatically after a short grace period.</p>
+    <p><a href="https://www.tethrd.io/tethrd/${t.id}">Confirm now →</a></p>`;
+
+  await Promise.all([
+    creatorEmail
+      ? sendEmail(creatorEmail, "Your tethrd expires in 15 minutes", warningHtml(creatorUsername))
+      : null,
+    joinerEmail && joinerUsername
+      ? sendEmail(joinerEmail, "Your tethrd expires in 15 minutes", warningHtml(joinerUsername))
+      : null,
+  ]);
 }
 
 async function expireTethrd(t: Tethrd) {
@@ -66,18 +103,10 @@ async function expireTethrd(t: Tethrd) {
 
   await Promise.all([
     creatorEmail
-      ? sendEmail(
-          creatorEmail,
-          "Tethrd expired — funds returned",
-          expiredHtml(creatorUsername)
-        )
+      ? sendEmail(creatorEmail, "Tethrd expired — funds returned", expiredHtml(creatorUsername))
       : null,
     joinerEmail && joinerUsername
-      ? sendEmail(
-          joinerEmail,
-          "Tethrd expired — funds returned",
-          expiredHtml(joinerUsername)
-        )
+      ? sendEmail(joinerEmail, "Tethrd expired — funds returned", expiredHtml(joinerUsername))
       : null,
   ]);
 }
