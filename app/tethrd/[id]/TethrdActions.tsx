@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import type { Tethrd } from "@/lib/types";
 
 export default function TethrdActions({
@@ -106,7 +107,7 @@ export default function TethrdActions({
 
       {!userId && canJoin && (
         <p className="text-sm text-slate-500 text-center">
-          <a href="/sign-in" className="text-indigo-600 font-medium">Sign in</a> to join this tethrd.
+          <Link href="/sign-in" className="text-indigo-600 font-medium">Sign in</Link> to join this tethrd.
         </p>
       )}
 
