@@ -6,9 +6,9 @@ export async function POST(req: NextRequest) {
   const { userId } = await auth();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { scenario, amount, timer_hours, description } = await req.json();
+  const { scenario, amount, deadline, description } = await req.json();
 
-  if (!scenario || !amount || !timer_hours || !description) {
+  if (!scenario || !amount || !deadline || !description) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   }
 
@@ -19,7 +19,8 @@ export async function POST(req: NextRequest) {
       scenario,
       amount,
       currency: "USD",
-      timer_hours,
+      timer_hours: 24,
+      deadline,
       description,
       status: "pending",
       creator_confirmed: false,

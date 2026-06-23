@@ -5,13 +5,18 @@ import { useRouter } from "next/navigation";
 import { SCENARIO_LABELS, SCENARIO_DESCRIPTIONS, type Scenario } from "@/lib/types";
 
 const SCENARIOS: Scenario[] = ["commitment_hold", "full_escrow", "service_payment"];
-const TIMERS = [3, 6, 12, 24] as const;
+
+function minDeadline() {
+  const d = new Date();
+  d.setHours(d.getHours() + 1);
+  return d.toISOString().slice(0, 16);
+}
 
 export default function NewTethrd() {
   const router = useRouter();
   const [scenario, setScenario] = useState<Scenario>("commitment_hold");
   const [amount, setAmount] = useState("");
-  const [timer, setTimer] = useState<3 | 6 | 12 | 24>(6);
+  const [deadline, setDeadline] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +29,12 @@ export default function NewTethrd() {
       const res = await fetch("/api/tethrd", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ scenario, amount: parseFloat(amount), timer_hours: timer, description }),
+        body: JSON.stringify({
+          scenario,
+          amount: parseFloat(amount),
+          deadline: new Date(deadline).toISOString(),
+          description,
+        }),
       });
       if (!res.ok) throw new Error("Failed to create tethrd");
       const { id } = await res.json();
@@ -89,25 +99,21 @@ export default function NewTethrd() {
             </div>
           </div>
 
-          {/* Timer */}
+          {/* Deadline */}
           <div>
-            <label className="block text-sm font-semibold text-slate-700 mb-3">Time window</label>
-            <div className="flex gap-3">
-              {TIMERS.map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => setTimer(t)}
-                  className={`px-4 py-2 rounded-xl border text-sm font-medium transition-colors ${
-                    timer === t
-                      ? "border-indigo-500 bg-indigo-50 text-indigo-600"
-                      : "border-slate-200 text-slate-600 hover:border-slate-300"
-                  }`}
-                >
-                  {t}h
-                </button>
-              ))}
-            </div>
+            <label htmlFor="deadline" className="block text-sm font-semibold text-slate-700 mb-2">
+              Deadline
+            </label>
+            <p className="text-xs text-slate-400 mb-3">If both parties haven&apos;t confirmed by this date and time, funds are returned automatically.</p>
+            <input
+              id="deadline"
+              type="datetime-local"
+              required
+              min={minDeadline()}
+              value={deadline}
+              onChange={(e) => setDeadline(e.target.value)}
+              className="w-full max-w-xs px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-indigo-500 transition-colors"
+            />
           </div>
 
           {/* Description */}

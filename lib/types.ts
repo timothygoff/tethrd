@@ -8,6 +8,7 @@ export interface Tethrd {
   amount: number;
   currency: string;
   timer_hours: 3 | 6 | 12 | 24;
+  deadline: string | null;
   description: string;
   status: TethrdStatus;
   creator_confirmed: boolean;

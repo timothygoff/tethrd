@@ -69,8 +69,12 @@ export default async function TethrdPage({
             <p className="text-lg font-bold">${t.amount.toLocaleString()}</p>
           </div>
           <div className="bg-slate-50 rounded-xl p-4">
-            <p className="text-xs text-slate-400 mb-1">Time window</p>
-            <p className="text-lg font-bold">{t.timer_hours}h</p>
+            <p className="text-xs text-slate-400 mb-1">Deadline</p>
+            <p className="text-base font-bold">
+              {t.deadline
+                ? new Date(t.deadline).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" })
+                : `${t.timer_hours}h`}
+            </p>
           </div>
           <div className="bg-slate-50 rounded-xl p-4">
             <p className="text-xs text-slate-400 mb-1">Currency</p>
