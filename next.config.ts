@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const requiredEnvVars = [
   "STRIPE_SECRET_KEY",
@@ -10,6 +11,8 @@ const requiredEnvVars = [
   "SUPABASE_SECRET_KEY",
   "RESEND_API_KEY",
   "CRON_SECRET",
+  "SENTRY_DSN",
+  "NEXT_PUBLIC_SENTRY_DSN",
 ];
 
 if (process.env.NODE_ENV !== "test" && !process.env.CI) {
@@ -22,4 +25,9 @@ if (process.env.NODE_ENV !== "test" && !process.env.CI) {
 
 const nextConfig: NextConfig = {};
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  org: "tethrd-ja",
+  project: "javascript-nextjs",
+  silent: true,
+  disableLogger: true,
+});
