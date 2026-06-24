@@ -4,7 +4,7 @@ import { getSupabase } from '@/lib/supabase'
 import { getStripe } from '@/lib/stripe'
 import { getUserEmail, getUsername } from '@/lib/clerk'
 import { sendEmail } from '@/lib/resend'
-import { createDbMock, TETHRD_FIXTURE, FUTURE_DATE } from './helpers'
+import { createDbMock, TETHRD_FIXTURE } from './helpers'
 
 vi.mock('@/lib/supabase')
 vi.mock('@/lib/stripe')
