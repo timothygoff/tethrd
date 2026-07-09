@@ -21,8 +21,7 @@ export default function SiteFooter() {
           </p>
         </div>
         <div className="foot-links">
-          {/* TODO: point to /terms once the Terms page ships */}
-          <a href="#">Terms</a>
+          <Link href="/terms">Terms</Link>
           <Link href="/privacy">Privacy</Link>
           <a href="mailto:hello@tethrd.io">hello@tethrd.io</a>
           <span className="foot-tag">© {new Date().getFullYear()} tethrd</span>
