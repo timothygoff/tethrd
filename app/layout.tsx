@@ -22,10 +22,27 @@ const poppins = Poppins({
   subsets: ["latin"],
 });
 
+const SITE_URL = "https://www.tethrd.io";
+const TITLE = "tethrd — Payment protection for two-party deals";
+const DESCRIPTION =
+  "tethrd holds the payment the second a deal is struck and releases it the second both sides deliver. Safe payments for private sales, freelance work, and every handshake in between.";
+
 export const metadata: Metadata = {
-  title: "tethrd — Payment protection for two-party deals",
-  description:
-    "tethrd holds the payment the second a deal is struck and releases it the second both sides deliver. Safe payments for private sales, freelance work, and every handshake in between.",
+  metadataBase: new URL(SITE_URL),
+  title: TITLE,
+  description: DESCRIPTION,
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    url: SITE_URL,
+    siteName: "tethrd",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 export default function RootLayout({

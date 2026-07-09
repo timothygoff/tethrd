@@ -1,0 +1,1 @@
+tethrd — payment protection for two-party deals. Neither of you has to go first.
