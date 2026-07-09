@@ -23,4 +23,304 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  overflow-x: hidden;
+}
+
+/* ============================================================
+   Landing page ("/") — brand navy + gold system.
+   Ported from the approved prototype. Page-level element rules
+   are scoped to `.landing` so app pages (dashboard, auth) that
+   rely on Tailwind are untouched.
+   ============================================================ */
+
+.landing {
+  /* light theme (default) — clean reading ground */
+  --ground:    #F4F6F8;
+  --surface:   #FFFFFF;
+  --surface-2: #EBEEF2;
+  --ink:       #1A2028;
+  --ink-2:     #48535D;
+  --ink-3:     #757F89;
+  --line:      #E0E4E9;
+  --line-strong:#CDD3DA;
+  --gold:      #B27C18;   /* darkened for text/line contrast on light */
+  --gold-fill: #D99A2B;   /* brand gold for fills */
+  --amber:     #F2B044;
+  --navy:      #1F252B;
+  --navy-deep: #171C21;
+  --on-navy:   #EEF1F3;
+  --shadow:    0 1px 2px rgba(26,32,40,.04), 0 12px 32px -12px rgba(26,32,40,.14);
+
+  --font-display: var(--font-poppins), "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --font-body:    "Helvetica Now Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  --maxw: 1120px;
+  --measure: 60ch;
+  --radius: 14px;
+  --radius-sm: 9px;
+
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+@media (prefers-color-scheme: dark) {
+  .landing {
+    --ground:    #12161A;
+    --surface:   #1C2228;
+    --surface-2: #242C33;
+    --ink:       #EEF1F3;
+    --ink-2:     #A9B2BA;
+    --ink-3:     #7C868E;
+    --line:      #2A323A;
+    --line-strong:#3A444D;
+    --gold:      #E3AA40;
+    --gold-fill: #D99A2B;
+    --amber:     #F2B044;
+    --navy:      #1F252B;
+    --navy-deep: #14181C;
+    --on-navy:   #EEF1F3;
+    --shadow:    0 1px 2px rgba(0,0,0,.3), 0 18px 40px -16px rgba(0,0,0,.55);
+  }
+}
+
+:root[data-theme="light"] .landing {
+  --ground:#F4F6F8; --surface:#FFFFFF; --surface-2:#EBEEF2;
+  --ink:#1A2028; --ink-2:#48535D; --ink-3:#757F89;
+  --line:#E0E4E9; --line-strong:#CDD3DA;
+  --gold:#B27C18; --gold-fill:#D99A2B; --amber:#F2B044;
+  --navy:#1F252B; --navy-deep:#171C21; --on-navy:#EEF1F3;
+  --shadow:0 1px 2px rgba(26,32,40,.04), 0 12px 32px -12px rgba(26,32,40,.14);
+}
+:root[data-theme="dark"] .landing {
+  --ground:#12161A; --surface:#1C2228; --surface-2:#242C33;
+  --ink:#EEF1F3; --ink-2:#A9B2BA; --ink-3:#7C868E;
+  --line:#2A323A; --line-strong:#3A444D;
+  --gold:#E3AA40; --gold-fill:#D99A2B; --amber:#F2B044;
+  --navy:#1F252B; --navy-deep:#14181C; --on-navy:#EEF1F3;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 18px 40px -16px rgba(0,0,0,.55);
+}
+
+/* Navy bands: re-scope tokens locally so every child component
+   renders correctly on navy, in both themes. Gold does the work. */
+.landing .band-navy {
+  background: var(--navy);
+  color: var(--on-navy);
+  --ink:        #F3F5F7;
+  --ink-2:      #B2BCC4;
+  --ink-3:      #8A949C;
+  --line:       rgba(255,255,255,.10);
+  --line-strong:rgba(255,255,255,.20);
+  --surface:    #242C33;
+  --surface-2:  #2B343C;
+  --gold:       #F2B044;   /* brighter gold reads better on navy */
+  --shadow:     0 18px 40px -18px rgba(0,0,0,.6);
+}
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+.landing h1, .landing h2, .landing h3 { font-family: var(--font-display); font-weight: 600; letter-spacing: -.02em; text-wrap: balance; margin: 0; }
+.landing p { margin: 0; }
+.landing a { color: inherit; text-decoration: none; }
+
+.landing .wrap { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+.landing .eyebrow {
+  font-family: var(--font-body); font-size: 12px; font-weight: 700;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--gold);
+  display: inline-flex; align-items: center; gap: 9px;
+}
+.landing .eyebrow::before { content: ""; width: 22px; height: 1px; background: currentColor; opacity: .75; }
+
+/* ---------- logo ---------- */
+.landing .brand { display: inline-flex; align-items: center; }
+.landing .brand-logo { height: 28px; width: auto; display: block; }
+.landing footer .brand-logo { height: 30px; }
+.landing .logo-gold { display: none; }
+.landing .logo-navy { display: block; }
+:root[data-theme="dark"] .landing .logo-gold { display: block; }
+:root[data-theme="dark"] .landing .logo-navy { display: none; }
+@media (prefers-color-scheme: dark) { .landing .logo-gold { display: block; } .landing .logo-navy { display: none; } }
+@media (prefers-color-scheme: dark) { :root[data-theme="light"] .landing .logo-gold { display: none; } :root[data-theme="light"] .landing .logo-navy { display: block; } }
+
+/* ---------- nav ---------- */
+.landing header {
+  position: sticky; top: 0; z-index: 50;
+  background: color-mix(in srgb, var(--ground) 85%, transparent);
+  backdrop-filter: saturate(1.4) blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.landing .nav { display: flex; align-items: center; justify-content: space-between; height: 70px; }
+.landing .nav-links { display: flex; align-items: center; gap: 30px; }
+.landing .nav-links a { font-size: 14.5px; color: var(--ink-2); transition: color .18s; }
+.landing .nav-links a:hover { color: var(--ink); }
+.landing .nav-right { display: flex; align-items: center; gap: 14px; }
+
+.landing .btn {
+  font-family: var(--font-body); font-size: 15px; font-weight: 600; border: 0; cursor: pointer;
+  border-radius: var(--radius-sm); padding: 11px 20px;
+  transition: transform .16s ease, box-shadow .2s ease, background .2s;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap;
+}
+.landing .btn-primary { background: var(--gold-fill); color: #23180A; box-shadow: 0 8px 22px -8px color-mix(in srgb, var(--gold-fill) 75%, transparent); }
+.landing .btn-primary:hover { background: var(--amber); transform: translateY(-1px); }
+.landing .btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--line-strong); }
+.landing .btn-ghost:hover { border-color: var(--ink-3); }
+.landing .btn:focus-visible, .landing a:focus-visible, .landing input:focus-visible, .landing .icon-btn:focus-visible, .landing summary:focus-visible {
+  outline: 2px solid var(--gold-fill); outline-offset: 3px; border-radius: 6px;
+}
+
+.landing .icon-btn {
+  width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line);
+  background: var(--surface); color: var(--ink-2); cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; transition: color .18s, border-color .18s;
+}
+.landing .icon-btn:hover { color: var(--ink); border-color: var(--line-strong); }
+.landing .sun { display: none; } .landing .moon { display: block; }
+:root[data-theme="dark"] .landing .sun { display: block; } :root[data-theme="dark"] .landing .moon { display: none; }
+@media (prefers-color-scheme: dark) { .landing .sun { display: block; } .landing .moon { display: none; } }
+@media (prefers-color-scheme: dark) { :root[data-theme="light"] .landing .sun { display: none; } :root[data-theme="light"] .landing .moon { display: block; } }
+
+/* ---------- hero (navy band) ---------- */
+.landing .hero { position: relative; overflow: hidden; padding: 84px 0 88px; }
+.landing .hero::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    radial-gradient(60% 70% at 78% 30%, color-mix(in srgb, var(--amber) 16%, transparent), transparent 62%),
+    radial-gradient(50% 60% at 12% 90%, color-mix(in srgb, var(--gold-fill) 10%, transparent), transparent 60%);
+}
+.landing .hero-grid { position: relative; display: grid; grid-template-columns: 1.05fr .95fr; gap: 56px; align-items: center; }
+/* Grid items default to min-width:auto, which stops the tether SVG from
+   shrinking below its intrinsic width and forces horizontal overflow on
+   narrow screens. Let them shrink. */
+.landing .hero-grid > * { min-width: 0; }
+.landing .hero h1 { font-size: clamp(40px, 5.6vw, 66px); line-height: 1.02; margin: 24px 0 0; font-weight: 600; color: #fff; }
+.landing .hl { position: relative; white-space: nowrap; color: var(--amber); }
+.landing .hl::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -.06em; height: .12em;
+  background: var(--gold-fill); border-radius: 3px; transform: scaleX(0); transform-origin: left;
+  animation: underline .7s 1.05s cubic-bezier(.65,0,.35,1) forwards;
+}
+.landing .hero .lead { color: #C4CDD5; font-size: clamp(17px, 1.7vw, 20px); max-width: 31rem; margin-top: 24px; line-height: 1.55; }
+
+.landing .signup { margin-top: 32px; max-width: 31rem; }
+.landing .field { display: flex; gap: 9px; background: var(--surface); border: 1px solid var(--line-strong); border-radius: var(--radius-sm); padding: 6px; box-shadow: var(--shadow); }
+.landing .field input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); font-family: var(--font-body); font-size: 15.5px; padding: 8px 12px; }
+.landing .field input::placeholder { color: var(--ink-3); }
+.landing .field input:focus { outline: none; }
+.landing .microcopy { margin-top: 12px; font-size: 13px; color: var(--ink-3); display: flex; align-items: center; gap: 7px; }
+.landing .signup-done { display: flex; align-items: center; gap: 10px; font-size: 15.5px; color: var(--ink); background: var(--surface); border: 1px solid var(--line-strong); border-left: 3px solid var(--gold-fill); border-radius: var(--radius-sm); padding: 15px 18px; box-shadow: var(--shadow); }
+.landing .signup-error { margin-top: 10px; font-size: 13.5px; color: #E5484D; }
+
+/* ---------- tether visual ---------- */
+.landing .tether-stage { position: relative; padding: 12px; }
+.landing .tether-stage::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: radial-gradient(50% 55% at 50% 46%, color-mix(in srgb, var(--gold-fill) 20%, transparent), transparent 68%);
+  filter: blur(6px);
+}
+.landing .tether-svg { width: 100%; height: auto; display: block; position: relative; }
+.landing .t-line { stroke: var(--gold-fill); stroke-width: 2.5; stroke-linecap: round; stroke-dasharray: 360; stroke-dashoffset: 360; animation: draw 1.1s .25s cubic-bezier(.65,0,.35,1) forwards; }
+.landing .t-endpoint { fill: var(--navy); stroke: #9AA4AD; stroke-width: 2.5; opacity: 0; animation: fadein .5s .15s forwards; }
+.landing .t-glow { fill: var(--gold-fill); opacity: 0; transform-box: fill-box; transform-origin: center; animation: glowpulse 2.8s 1.3s ease-in-out infinite; }
+.landing .t-node { fill: var(--gold-fill); opacity: 0; transform-box: fill-box; transform-origin: center; animation: pop .55s 1.05s cubic-bezier(.34,1.56,.64,1) forwards; }
+.landing .t-lock { opacity: 0; animation: fadein .5s 1.35s forwards; }
+.landing .t-label { font-family: var(--font-body); font-size: 12px; font-weight: 700; letter-spacing: .14em; fill: #9AA4AD; text-transform: uppercase; opacity: 0; animation: fadein .6s .6s forwards; }
+.landing .t-amount-pill { opacity: 0; animation: fadein .5s 1.45s forwards; }
+.landing .t-amount-bg { fill: var(--gold-fill); }
+.landing .t-amount-text { font-family: var(--font-display); font-size: 14px; font-weight: 600; fill: #23180A; letter-spacing: .01em; }
+.landing .t-amount-tag { font-family: var(--font-body); font-size: 9.5px; font-weight: 700; letter-spacing: .2em; fill: #5A3E0C; }
+
+@keyframes draw { to { stroke-dashoffset: 0; } }
+@keyframes fadein { to { opacity: 1; } }
+@keyframes pop { 0% { opacity: 0; transform: scale(.3); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes glowpulse { 0%,100% { opacity: .18; transform: scale(1); } 50% { opacity: .36; transform: scale(1.22); } }
+@keyframes underline { to { transform: scaleX(1); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .landing .t-line, .landing .t-endpoint, .landing .t-glow, .landing .t-node, .landing .t-label, .landing .t-lock, .landing .t-amount-pill { animation: none !important; opacity: 1; stroke-dashoffset: 0; }
+  .landing .t-glow { opacity: .26; }
+  .landing .hl::after { animation: none; transform: scaleX(1); }
+}
+
+/* ---------- generic section ---------- */
+.landing .section { padding: 78px 0; }
+.landing .section + .section { border-top: 1px solid var(--line); }
+.landing .section-head { max-width: 46rem; }
+.landing .section-head h2 { font-size: clamp(27px, 3.4vw, 39px); line-height: 1.08; margin-top: 16px; }
+.landing .section-head p { color: var(--ink-2); margin-top: 15px; max-width: var(--measure); font-size: 17.5px; }
+
+/* ---------- how it works: beads on a thread ---------- */
+.landing .steps { margin-top: 46px; position: relative; display: grid; gap: 30px; }
+.landing .steps::before { content: ""; position: absolute; left: 25px; top: 26px; bottom: 26px; width: 2px; background: linear-gradient(var(--gold-fill), color-mix(in srgb, var(--gold-fill) 25%, var(--line))); }
+.landing .step { position: relative; display: grid; grid-template-columns: 52px 1fr; gap: 26px; align-items: start; }
+.landing .bead {
+  width: 52px; height: 52px; border-radius: 50%; flex: none; z-index: 1;
+  background: var(--surface); border: 2px solid var(--gold-fill);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-weight: 600; font-size: 16px; color: var(--gold);
+  box-shadow: 0 0 0 6px var(--ground); font-variant-numeric: tabular-nums;
+}
+.landing .step-body { padding-top: 5px; }
+.landing .step-body h3 { font-size: 21px; color: var(--ink); }
+.landing .step-body p { color: var(--ink-2); margin-top: 8px; max-width: var(--measure); }
+
+/* ---------- use cases ---------- */
+.landing .cards { margin-top: 46px; display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+.landing .card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 30px 28px; box-shadow: var(--shadow); transition: transform .2s ease, border-color .2s ease; }
+.landing .card:hover { transform: translateY(-3px); border-color: var(--gold-fill); }
+.landing .card .ic { width: 46px; height: 46px; border-radius: 11px; background: color-mix(in srgb, var(--gold-fill) 15%, var(--surface)); display: flex; align-items: center; justify-content: center; color: var(--gold); margin-bottom: 18px; }
+.landing .card h3 { font-size: 20px; }
+.landing .card p { color: var(--ink-2); margin-top: 10px; font-size: 16px; }
+
+/* ---------- trust band ---------- */
+.landing .trust h2 { color: #fff; font-size: clamp(25px, 3vw, 34px); margin-top: 15px; max-width: 24rem; }
+.landing .trust-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; margin-top: 44px; }
+.landing .trust-item { border-top: 2px solid color-mix(in srgb, var(--amber) 60%, transparent); padding-top: 16px; }
+.landing .trust-item h4 { font-family: var(--font-display); font-weight: 600; font-size: 16.5px; color: #fff; margin: 0; }
+.landing .trust-item p { color: #AEB8C0; font-size: 14.5px; margin-top: 8px; line-height: 1.5; }
+
+/* ---------- faq ---------- */
+.landing .faq { margin-top: 42px; border-top: 1px solid var(--line); max-width: 52rem; }
+.landing details { border-bottom: 1px solid var(--line); }
+.landing summary { list-style: none; cursor: pointer; padding: 22px 4px; display: flex; align-items: center; justify-content: space-between; gap: 20px; font-family: var(--font-display); font-weight: 500; font-size: 18.5px; color: var(--ink); }
+.landing summary::-webkit-details-marker { display: none; }
+.landing .chev { flex: none; width: 22px; height: 22px; color: var(--gold); transition: transform .25s ease; }
+.landing details[open] .chev { transform: rotate(45deg); }
+.landing details p { color: var(--ink-2); padding: 0 4px 24px; max-width: var(--measure); font-size: 16px; margin: 0; }
+
+/* ---------- final cta ---------- */
+.landing .final { text-align: center; position: relative; overflow: hidden; }
+.landing .final::before { content:""; position:absolute; inset:0; pointer-events:none; background: radial-gradient(50% 80% at 50% 0%, color-mix(in srgb, var(--amber) 14%, transparent), transparent 60%); }
+.landing .final .wrap { position: relative; padding-top: 86px; padding-bottom: 86px; }
+.landing .final .eyebrow { justify-content: center; }
+.landing .final h2 { color: #fff; font-size: clamp(30px, 4vw, 46px); margin: 16px auto 0; max-width: 18ch; }
+.landing .final p { color: #B2BCC4; margin: 16px auto 0; max-width: 34rem; }
+.landing .final .signup { margin: 32px auto 0; }
+.landing .final .microcopy { justify-content: center; }
+
+/* ---------- footer ---------- */
+.landing footer .foot { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; padding: 40px 0; flex-wrap: wrap; }
+.landing footer .brand { font-size: 19px; color: #fff; }
+.landing .foot-tag { color: #8A949C; font-size: 13.5px; }
+.landing .foot-links { display: flex; gap: 24px; align-items: center; }
+.landing .foot-links a { color: #B2BCC4; font-size: 14px; transition: color .18s; }
+.landing .foot-links a:hover { color: #fff; }
+
+/* ---------- responsive ---------- */
+@media (max-width: 900px) {
+  .landing .hero-grid { grid-template-columns: 1fr; gap: 30px; }
+  .landing .tether-stage { order: -1; max-width: 460px; margin: 0 auto; width: 100%; }
+  .landing .trust-grid { grid-template-columns: 1fr 1fr; gap: 24px 22px; }
+  .landing .nav-links { display: none; }
+}
+@media (max-width: 620px) {
+  .landing { font-size: 16px; }
+  .landing .hero { padding: 54px 0 60px; }
+  .landing .cards { grid-template-columns: 1fr; }
 }

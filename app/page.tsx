@@ -1,55 +1,27 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element */
+
 import { useState } from "react";
 
-function WaitlistForm({
-  email,
-  submitted,
-  loading,
-  error,
-  onEmailChange,
-  onSubmit,
-}: {
-  email: string;
-  submitted: boolean;
-  loading: boolean;
-  error: string | null;
-  onEmailChange: (v: string) => void;
-  onSubmit: (e: React.FormEvent) => void;
-}) {
-  if (submitted) {
-    return (
-      <div className="bg-indigo-50 border border-indigo-200 rounded-xl px-8 py-5 text-indigo-600 text-sm font-medium inline-block">
-        You&apos;re on the list. We&apos;ll be in touch.
-      </div>
-    );
+function toggleTheme() {
+  const root = document.documentElement;
+  let current = root.getAttribute("data-theme");
+  if (!current) {
+    current = window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
   }
-  return (
-    <div className="w-full max-w-md mx-auto">
-      <form onSubmit={onSubmit} className="flex flex-col sm:flex-row gap-3">
-        <input
-          type="email"
-          required
-          placeholder="your@email.com"
-          value={email}
-          onChange={(e) => onEmailChange(e.target.value)}
-          disabled={loading}
-          className="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 placeholder-slate-400 text-sm focus:outline-none focus:border-indigo-500 transition-colors shadow-sm disabled:opacity-50"
-        />
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-3 rounded-xl text-sm transition-colors whitespace-nowrap shadow-sm disabled:opacity-50"
-        >
-          {loading ? "Saving..." : "Get Early Access"}
-        </button>
-      </form>
-      {error && <p className="text-red-500 text-xs mt-2 text-center">{error}</p>}
-    </div>
-  );
+  root.setAttribute("data-theme", current === "dark" ? "light" : "dark");
 }
 
-export default function Home() {
+function WaitlistForm({
+  source,
+  microcopy,
+}: {
+  source: string;
+  microcopy: React.ReactNode;
+}) {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -63,7 +35,7 @@ export default function Home() {
       const res = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, source }),
       });
       if (!res.ok) throw new Error("Failed");
       setSubmitted(true);
@@ -76,110 +48,532 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-white text-slate-900">
-
-      {/* Nav */}
-      <nav className="flex items-center justify-between px-6 py-5 max-w-5xl mx-auto border-b border-slate-100">
-        <span className="text-xl font-bold tracking-tight text-slate-900">tethrd</span>
-        <span className="text-sm text-slate-400">Secure escrow for everyone</span>
-      </nav>
-
-      {/* Hero */}
-      <section className="flex flex-col items-center text-center px-6 pt-20 pb-24 max-w-3xl mx-auto">
-        <div className="inline-block bg-indigo-100 text-indigo-600 text-xs font-semibold px-3 py-1 rounded-full mb-6 tracking-wide uppercase">
-          Coming Soon
-        </div>
-        <h1 className="text-4xl sm:text-6xl font-bold tracking-tight leading-tight mb-6 text-slate-900">
-          Two parties.<br />Funds held.<br />
-          <span className="text-indigo-600">Both confirm.</span>
-        </h1>
-        <p className="text-lg text-slate-500 max-w-xl mb-10 leading-relaxed">
-          tethrd holds funds securely between two people until both sides confirm the deal is done. No agreement? Timer expires and everyone gets their money back — automatically.
-        </p>
-
-        <WaitlistForm email={email} submitted={submitted} loading={loading} error={error} onEmailChange={setEmail} onSubmit={handleSubmit} />
-      </section>
-
-      {/* How it works */}
-      <section className="px-6 py-20 max-w-5xl mx-auto">
-        <h2 className="text-2xl font-bold text-center mb-2 text-slate-900">How it works</h2>
-        <p className="text-slate-400 text-center text-sm mb-12">Three steps. No middleman. No drama.</p>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-          {[
-            {
-              step: "1",
-              title: "Create a tethrd",
-              desc: "Choose your scenario, set the amount, and pick a time window — 3, 6, 12, or 24 hours.",
-            },
-            {
-              step: "2",
-              title: "Share the link",
-              desc: "Send the link to the other party. They join, review the terms, and deposit their portion.",
-            },
-            {
-              step: "3",
-              title: "Both confirm, funds release",
-              desc: "After the meeting or service, both parties confirm. Funds release instantly. Timer expires? Full refund to both.",
-            },
-          ].map((item) => (
-            <div key={item.step} className="bg-slate-50 border border-slate-100 rounded-2xl p-6 shadow-sm">
-              <div className="w-9 h-9 bg-indigo-600 rounded-lg flex items-center justify-center text-sm font-bold text-white mb-4">
-                {item.step}
-              </div>
-              <h3 className="font-semibold text-slate-900 mb-2">{item.title}</h3>
-              <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
+    <>
+      <form className="signup" onSubmit={handleSubmit}>
+        {submitted ? (
+          <div className="signup-done" role="status">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="var(--gold-fill)"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M20 6 9 17l-5-5" />
+            </svg>
+            You&apos;re on the list — we&apos;ll email your invite soon.
+          </div>
+        ) : (
+          <>
+            <div className="field">
+              <input
+                type="email"
+                required
+                placeholder="you@email.com"
+                aria-label="Email address"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
+              />
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={loading}
+              >
+                {loading ? "Joining…" : "Join the waitlist"}
+              </button>
             </div>
-          ))}
-        </div>
-      </section>
+            {error && <p className="signup-error">{error}</p>}
+          </>
+        )}
+      </form>
+      {!submitted && microcopy}
+    </>
+  );
+}
 
-      {/* Scenarios */}
-      <section className="px-6 py-20 bg-slate-50">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-4 text-slate-900">Built for every situation</h2>
-          <p className="text-slate-400 text-center mb-12 text-sm">Three scenarios to cover any two-party transaction.</p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {[
-              {
-                title: "Commitment Hold",
-                icon: "🤝",
-                desc: "Person A deposits to secure a meeting slot. Both confirm post-meeting — deposit releases. No-show? Auto-refund.",
-              },
-              {
-                title: "Full Two-Way Escrow",
-                icon: "⚖️",
-                desc: "Both parties deposit simultaneously. Both confirm — funds cross. Timer expires — everything returns to its owner.",
-              },
-              {
-                title: "Service Payment",
-                icon: "💼",
-                desc: "Client pays upfront into escrow. Provider delivers, both confirm, payment releases. No delivery? Full refund.",
-              },
-            ].map((item) => (
-              <div key={item.title} className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm">
-                <div className="text-2xl mb-4">{item.icon}</div>
-                <h3 className="font-semibold text-slate-900 mb-2">{item.title}</h3>
-                <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
+export default function Home() {
+  return (
+    <div className="landing">
+      <header>
+        <div className="wrap nav">
+          <a className="brand" href="#top" aria-label="tethrd home">
+            <img
+              className="brand-logo logo-navy"
+              src="/tethrd-logo-navy.png"
+              alt="tethrd"
+              width={138}
+              height={30}
+            />
+            <img
+              className="brand-logo logo-gold"
+              src="/tethrd-logo-gold.png"
+              alt="tethrd"
+              width={138}
+              height={30}
+            />
+          </a>
+          <nav className="nav-links" aria-label="Primary">
+            <a href="#how">How it works</a>
+            <a href="#who">Who it&apos;s for</a>
+            <a href="#faq">FAQ</a>
+          </nav>
+          <div className="nav-right">
+            <button
+              className="icon-btn"
+              id="themeBtn"
+              aria-label="Toggle color theme"
+              onClick={toggleTheme}
+            >
+              <svg
+                className="moon"
+                width="17"
+                height="17"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+              </svg>
+              <svg
+                className="sun"
+                width="17"
+                height="17"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="12" cy="12" r="4.2" />
+                <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+              </svg>
+            </button>
+            <a href="#join" className="btn btn-primary">
+              Join the waitlist
+            </a>
           </div>
         </div>
-      </section>
+      </header>
 
-      {/* Bottom CTA */}
-      <section className="px-6 py-24 text-center max-w-2xl mx-auto">
-        <h2 className="text-3xl font-bold mb-4 text-slate-900">No arbitration. No disputes.<br />The timer decides.</h2>
-        <p className="text-slate-500 mb-8 text-sm leading-relaxed">
-          Flat fee per transaction. Both parties protected. Launch coming soon — get early access now.
-        </p>
-        <WaitlistForm email={email} submitted={submitted} loading={loading} error={error} onEmailChange={setEmail} onSubmit={handleSubmit} />
-      </section>
+      <main id="top">
+        <section className="hero band-navy">
+          <div className="wrap hero-grid">
+            <div className="hero-copy">
+              <span className="eyebrow">Payment protection</span>
+              <h1>
+                Neither of you has to <span className="hl">go first</span>.
+              </h1>
+              <p className="lead">
+                tethrd holds the payment the second a deal is struck — and
+                releases it the second both sides deliver. Safe payments for
+                private sales, freelance work, and every handshake in between.
+              </p>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-100 px-6 py-8 text-center text-slate-400 text-xs">
-        © {new Date().getFullYear()} tethrd. All rights reserved.
+              <WaitlistForm
+                source="landing-hero"
+                microcopy={
+                  <p className="microcopy">
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <rect x="3" y="11" width="18" height="11" rx="2" />
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                    Early access is rolling out soon. No spam — just your invite.
+                  </p>
+                }
+              />
+            </div>
+
+            <div className="tether-stage">
+              <svg
+                className="tether-svg"
+                viewBox="0 0 460 200"
+                role="img"
+                aria-label="A payment held safely on a line between two parties."
+              >
+                <line className="t-line" x1="52" y1="118" x2="408" y2="118" />
+                <circle className="t-endpoint" cx="52" cy="118" r="8.5" />
+                <circle className="t-endpoint" cx="408" cy="118" r="8.5" />
+                <text className="t-label" x="52" y="150" textAnchor="middle">
+                  You
+                </text>
+                <text className="t-label" x="408" y="150" textAnchor="middle">
+                  Them
+                </text>
+
+                <circle className="t-glow" cx="230" cy="118" r="30" />
+                <circle className="t-node" cx="230" cy="118" r="20" />
+                <g className="t-lock">
+                  <rect
+                    x="223"
+                    y="116"
+                    width="14"
+                    height="11"
+                    rx="2"
+                    fill="#23180A"
+                  />
+                  <path
+                    d="M225.5 116 v-2.4 a4.5 4.5 0 0 1 9 0 V116"
+                    fill="none"
+                    stroke="#23180A"
+                    strokeWidth="2"
+                  />
+                </g>
+
+                <g className="t-amount-pill">
+                  <rect
+                    className="t-amount-bg"
+                    x="176"
+                    y="48"
+                    width="108"
+                    height="42"
+                    rx="10"
+                  />
+                  <text
+                    className="t-amount-tag"
+                    x="230"
+                    y="65"
+                    textAnchor="middle"
+                  >
+                    HELD
+                  </text>
+                  <text
+                    className="t-amount-text"
+                    x="230"
+                    y="81"
+                    textAnchor="middle"
+                  >
+                    $1,200.00
+                  </text>
+                  <line
+                    x1="230"
+                    y1="90"
+                    x2="230"
+                    y2="98"
+                    stroke="var(--gold-fill)"
+                    strokeWidth="2"
+                  />
+                </g>
+              </svg>
+            </div>
+          </div>
+        </section>
+
+        <section className="section" id="how">
+          <div className="wrap">
+            <div className="section-head">
+              <span className="eyebrow">How it works</span>
+              <h2>One tether. Three moments.</h2>
+              <p>
+                The money is always in exactly one place — and both of you can
+                always see where.
+              </p>
+            </div>
+            <div className="steps">
+              <div className="step">
+                <div className="bead">01</div>
+                <div className="step-body">
+                  <h3>Fund</h3>
+                  <p>
+                    The buyer puts the money in. It leaves their account but
+                    doesn&apos;t reach the seller — it&apos;s held safely in the
+                    middle, in plain sight of both sides.
+                  </p>
+                </div>
+              </div>
+              <div className="step">
+                <div className="bead">02</div>
+                <div className="step-body">
+                  <h3>Hold</h3>
+                  <p>
+                    Everyone does their part: ship the item, finish the work,
+                    hand over the keys. The payment waits — protected — while the
+                    deal plays out.
+                  </p>
+                </div>
+              </div>
+              <div className="step">
+                <div className="bead">03</div>
+                <div className="step-body">
+                  <h3>Release</h3>
+                  <p>
+                    Done and confirmed? The payment releases to the seller in
+                    full. Deal fell through? It goes straight back to the buyer.
+                    No chasing, no ghosting.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="section" id="who">
+          <div className="wrap">
+            <div className="section-head">
+              <span className="eyebrow">Who it&apos;s for</span>
+              <h2>Built for the deals where trust is the hard part.</h2>
+            </div>
+            <div className="cards">
+              <div className="card">
+                <div className="ic">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.9"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M3 9l1.5-4.5A2 2 0 0 1 6.4 3h11.2a2 2 0 0 1 1.9 1.5L21 9" />
+                    <path d="M3 9h18v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <path d="M9 13h6" />
+                  </svg>
+                </div>
+                <h3>Private sales</h3>
+                <p>
+                  Selling a couch, a camera, or a car to someone you found in an
+                  online listing. Both of you commit without gambling on the
+                  other being honest.
+                </p>
+              </div>
+              <div className="card">
+                <div className="ic">
+                  <svg
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.9"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M4 7h16v13H4z" />
+                    <path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+                    <path d="M4 12h16" />
+                  </svg>
+                </div>
+                <h3>Freelance &amp; services</h3>
+                <p>
+                  Clients fund the project before you start. You do the work
+                  knowing the money&apos;s already there — and it releases the
+                  moment you deliver.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="section band-navy trust">
+          <div className="wrap">
+            <span className="eyebrow">Why it&apos;s safe</span>
+            <h2>Your money is protected the whole way through.</h2>
+            <div className="trust-grid">
+              <div className="trust-item">
+                <h4>Powered by Stripe</h4>
+                <p>
+                  Every payment runs on Stripe&apos;s infrastructure. tethrd
+                  never touches your money directly.
+                </p>
+              </div>
+              <div className="trust-item">
+                <h4>Held, not spent</h4>
+                <p>
+                  Funds sit protected until your deal&apos;s agreed conditions
+                  are met — not a moment before.
+                </p>
+              </div>
+              <div className="trust-item">
+                <h4>Refunded if it falls apart</h4>
+                <p>
+                  If the deal doesn&apos;t happen, the buyer gets every cent
+                  back. Automatically.
+                </p>
+              </div>
+              <div className="trust-item">
+                <h4>One flat fee</h4>
+                <p>
+                  2% per protected deal, paid at release. No subscriptions, no
+                  surprises.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="section" id="faq">
+          <div className="wrap">
+            <div className="section-head">
+              <span className="eyebrow">FAQ</span>
+              <h2>The questions everyone asks first.</h2>
+            </div>
+            <div className="faq">
+              <details open>
+                <summary>
+                  How does tethrd actually keep my money safe?
+                  <svg
+                    className="chev"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  >
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                </summary>
+                <p>
+                  Every payment is processed and held through Stripe, our
+                  payments partner. The funds are protected the entire time and
+                  only move when your deal&apos;s agreed conditions are met.
+                </p>
+              </details>
+              <details>
+                <summary>
+                  When does the seller get paid?
+                  <svg
+                    className="chev"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  >
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                </summary>
+                <p>
+                  The moment the buyer confirms they&apos;ve received what was
+                  agreed. Once released, the payment lands in the seller&apos;s
+                  account on Stripe&apos;s normal payout schedule.
+                </p>
+              </details>
+              <details>
+                <summary>
+                  What happens if the deal falls through?
+                  <svg
+                    className="chev"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  >
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                </summary>
+                <p>
+                  If the conditions aren&apos;t met or the deadline passes, the
+                  payment is returned to the buyer in full. Nobody&apos;s left
+                  chasing a refund.
+                </p>
+              </details>
+              <details>
+                <summary>
+                  What does it cost?
+                  <svg
+                    className="chev"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  >
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                </summary>
+                <p>
+                  A flat 2% per protected deal, paid when the payment is
+                  released. No monthly fees and nothing to pay if a deal never
+                  goes ahead.
+                </p>
+              </details>
+              <details>
+                <summary>
+                  When can I start using it?
+                  <svg
+                    className="chev"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  >
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                </summary>
+                <p>
+                  We&apos;re rolling out early access now, in small batches. Join
+                  the waitlist and you&apos;ll be among the first invited in.
+                </p>
+              </details>
+            </div>
+          </div>
+        </section>
+
+        <section className="section band-navy final" id="join">
+          <div className="wrap">
+            <span className="eyebrow">Early access</span>
+            <h2>Be first on the tether.</h2>
+            <p>
+              We&apos;re inviting early users in small batches. Drop your email
+              and we&apos;ll reach out the moment your spot opens up.
+            </p>
+            <WaitlistForm
+              source="landing-final"
+              microcopy={
+                <p className="microcopy">
+                  We&apos;ll only ever email you about your invite.
+                </p>
+              }
+            />
+          </div>
+        </section>
+      </main>
+
+      <footer className="band-navy">
+        <div className="wrap foot">
+          <div>
+            <div className="brand">
+              <img
+                className="brand-logo"
+                src="/tethrd-logo-white.png"
+                alt="tethrd"
+                width={138}
+                height={30}
+              />
+            </div>
+            <p className="foot-tag" style={{ marginTop: 10 }}>
+              Payment protection for two-party deals.
+            </p>
+          </div>
+          <div className="foot-links">
+            <a href="#">Terms</a>
+            <a href="#">Privacy</a>
+            <a href="mailto:hello@tethrd.io">hello@tethrd.io</a>
+            <span className="foot-tag">© 2026 tethrd</span>
+          </div>
+        </div>
       </footer>
-
-    </main>
+    </div>
   );
 }
