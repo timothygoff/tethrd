@@ -1,19 +1,8 @@
 "use client";
 
-/* eslint-disable @next/next/no-img-element */
-
 import { useState } from "react";
-
-function toggleTheme() {
-  const root = document.documentElement;
-  let current = root.getAttribute("data-theme");
-  if (!current) {
-    current = window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light";
-  }
-  root.setAttribute("data-theme", current === "dark" ? "light" : "dark");
-}
+import SiteHeader from "./_components/SiteHeader";
+import SiteFooter from "./_components/SiteFooter";
 
 function WaitlistForm({
   source,
@@ -99,70 +88,7 @@ function WaitlistForm({
 export default function Home() {
   return (
     <div className="landing">
-      <header>
-        <div className="wrap nav">
-          <a className="brand" href="#top" aria-label="tethrd home">
-            <img
-              className="brand-logo logo-navy"
-              src="/tethrd-logo-navy.png"
-              alt="tethrd"
-              width={138}
-              height={30}
-            />
-            <img
-              className="brand-logo logo-gold"
-              src="/tethrd-logo-gold.png"
-              alt="tethrd"
-              width={138}
-              height={30}
-            />
-          </a>
-          <nav className="nav-links" aria-label="Primary">
-            <a href="#how">How it works</a>
-            <a href="#who">Who it&apos;s for</a>
-            <a href="#faq">FAQ</a>
-          </nav>
-          <div className="nav-right">
-            <button
-              className="icon-btn"
-              id="themeBtn"
-              aria-label="Toggle color theme"
-              onClick={toggleTheme}
-            >
-              <svg
-                className="moon"
-                width="17"
-                height="17"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-              </svg>
-              <svg
-                className="sun"
-                width="17"
-                height="17"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="12" cy="12" r="4.2" />
-                <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
-              </svg>
-            </button>
-            <a href="#join" className="btn btn-primary">
-              Join the waitlist
-            </a>
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
 
       <main id="top">
         <section className="hero band-navy">
@@ -550,30 +476,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="band-navy">
-        <div className="wrap foot">
-          <div>
-            <div className="brand">
-              <img
-                className="brand-logo"
-                src="/tethrd-logo-white.png"
-                alt="tethrd"
-                width={138}
-                height={30}
-              />
-            </div>
-            <p className="foot-tag" style={{ marginTop: 10 }}>
-              Payment protection for two-party deals.
-            </p>
-          </div>
-          <div className="foot-links">
-            <a href="#">Terms</a>
-            <a href="#">Privacy</a>
-            <a href="mailto:hello@tethrd.io">hello@tethrd.io</a>
-            <span className="foot-tag">© 2026 tethrd</span>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

@@ -304,6 +304,17 @@ html { scroll-behavior: smooth; }
 .landing .final .signup { margin: 32px auto 0; }
 .landing .final .microcopy { justify-content: center; }
 
+/* ---------- legal / long-form content pages ---------- */
+.landing .legal { max-width: 46rem; margin-top: 30px; }
+.landing .legal .updated { color: var(--ink-3); font-size: 14px; letter-spacing: .01em; }
+.landing .legal h3 { font-size: 20px; color: var(--ink); margin-top: 36px; margin-bottom: 0; }
+.landing .legal p { color: var(--ink-2); margin-top: 12px; font-size: 16.5px; line-height: 1.65; }
+.landing .legal ul { color: var(--ink-2); margin: 12px 0 0; padding-left: 1.25rem; font-size: 16.5px; line-height: 1.65; }
+.landing .legal li { margin-top: 8px; }
+.landing .legal strong { color: var(--ink); font-weight: 600; }
+.landing .legal a { color: var(--gold); text-decoration: underline; text-underline-offset: 2px; }
+.landing .legal a:hover { color: var(--gold-fill); }
+
 /* ---------- footer ---------- */
 .landing footer .foot { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; padding: 40px 0; flex-wrap: wrap; }
 .landing footer .brand { font-size: 19px; color: #fff; }
