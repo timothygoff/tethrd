@@ -53,7 +53,7 @@ export const TETHRD_FIXTURE: Tethrd = {
   id: 'tethrd_abc',
   creator_id: 'user_creator',
   joiner_id: null,
-  scenario: 'full_escrow',
+  scenario: 'two_way_hold',
   amount: 100,
   currency: 'USD',
   timer_hours: 24,

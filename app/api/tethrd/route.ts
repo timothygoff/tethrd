@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
 import { getSupabase } from "@/lib/supabase";
 
-const VALID_SCENARIOS = ["commitment_hold", "full_escrow", "service_payment"];
+const VALID_SCENARIOS = ["commitment_hold", "two_way_hold", "service_payment"];
 
 export async function POST(req: NextRequest) {
   const { userId } = await auth();

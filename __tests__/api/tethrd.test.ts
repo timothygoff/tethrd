@@ -8,7 +8,7 @@ vi.mock('@clerk/nextjs/server')
 vi.mock('@/lib/supabase')
 
 const VALID_BODY = {
-  scenario: 'full_escrow',
+  scenario: 'two_way_hold',
   amount: 100,
   deadline: FUTURE_DATE,
   description: 'A valid test deal description',
@@ -27,7 +27,7 @@ describe('POST /api/tethrd — auth + validation', () => {
   })
 
   it('returns 400 when required fields are missing', async () => {
-    const res = await POST(makePostRequest({ scenario: 'full_escrow' }) as any)
+    const res = await POST(makePostRequest({ scenario: 'two_way_hold' }) as any)
     expect(res.status).toBe(400)
     expect((await res.json()).error).toBe('Missing fields')
   })

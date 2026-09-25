@@ -1,6 +1,6 @@
 # tethrd
 
-Two-party escrow web app. Funds held until both parties confirm — timer expires, everyone gets their money back automatically.
+Two-party payment protection web app. Payments are held until both parties confirm — timer expires, everyone gets their money back automatically.
 
 Built with Next.js 16, deployed on Vercel at [tethrd.io](https://tethrd.io).
 
@@ -21,4 +21,4 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Status
 
-Pre-MVP — landing page + waitlist live. Auth, escrow flow, and Stripe Connect in progress.
+Pre-MVP — landing page + waitlist live. Auth, hold-and-release flow, and Stripe Connect in progress.

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { SCENARIO_LABELS, SCENARIO_DESCRIPTIONS, type Scenario } from "@/lib/types";
 
-const SCENARIOS: Scenario[] = ["commitment_hold", "full_escrow", "service_payment"];
+const SCENARIOS: Scenario[] = ["commitment_hold", "two_way_hold", "service_payment"];
 
 function minDeadline() {
   const d = new Date();

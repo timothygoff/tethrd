@@ -1,4 +1,4 @@
-export type Scenario = "commitment_hold" | "full_escrow" | "service_payment";
+export type Scenario = "commitment_hold" | "two_way_hold" | "service_payment";
 export type TethrdStatus = "pending" | "active" | "capturing" | "confirmed" | "expired" | "cancelled";
 
 export interface Tethrd {
@@ -22,12 +22,12 @@ export interface Tethrd {
 
 export const SCENARIO_LABELS: Record<Scenario, string> = {
   commitment_hold: "Commitment Hold",
-  full_escrow: "Full Two-Way Escrow",
+  two_way_hold: "Two-Way Hold",
   service_payment: "Service Payment",
 };
 
 export const SCENARIO_DESCRIPTIONS: Record<Scenario, string> = {
   commitment_hold: "One party deposits to secure a meeting. Both confirm after — deposit releases. No-show? Auto-refund.",
-  full_escrow: "Both parties deposit simultaneously. Both confirm — funds cross. Timer expires — everything returns.",
-  service_payment: "Client pays upfront into escrow. Provider delivers, both confirm, payment releases.",
+  two_way_hold: "Both parties pay in at the same time and we hold both payments. Both confirm — the payments are released. Timer expires — everyone is refunded.",
+  service_payment: "Client pays upfront and we hold the payment. Provider delivers, both confirm, payment releases.",
 };
