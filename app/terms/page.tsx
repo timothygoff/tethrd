@@ -56,6 +56,12 @@ export default function TermsPage() {
                 payment is returned to the buyer.
               </p>
               <p>
+                For services, we call the buyer the <strong>client</strong> and
+                the seller the <strong>provider</strong>. Everything in these
+                Terms that applies to a buyer or seller applies to a client or
+                provider in the same way.
+              </p>
+              <p>
                 tethrd is a technology service, not a bank, money transmitter, or
                 fiduciary. We are not a party to the underlying deal between you
                 and the other person, and we do not take ownership of the money.

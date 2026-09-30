@@ -2,7 +2,7 @@ import { auth, clerkClient } from "@clerk/nextjs/server";
 import { getSupabase } from "@/lib/supabase";
 import { notFound } from "next/navigation";
 import TethrdActions from "./TethrdActions";
-import { SCENARIO_LABELS, type Tethrd } from "@/lib/types";
+import { ROLE_LABELS, SCENARIO_LABELS, type Tethrd } from "@/lib/types";
 
 async function getUsername(userId: string): Promise<string> {
   try {
@@ -37,6 +37,7 @@ export default async function TethrdPage({
   const isCreator = userId === t.creator_id;
   const isJoiner = userId === t.joiner_id;
   const canJoin = !isCreator && !t.joiner_id && t.status === "pending";
+  const roles = ROLE_LABELS[t.scenario];
 
   const [creatorUsername, joinerUsername] = await Promise.all([
     getUsername(t.creator_id),
@@ -89,13 +90,15 @@ export default async function TethrdPage({
             <div className="flex items-center gap-2">
               <div className={`w-3 h-3 rounded-full ${t.creator_confirmed ? "bg-green-500" : "bg-slate-200"}`} />
               <span className="text-sm text-slate-600">
-                @{creatorUsername} {t.creator_confirmed ? "confirmed ✓" : "pending"}
+                {roles.payee} @{creatorUsername} {t.creator_confirmed ? "confirmed ✓" : "pending"}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <div className={`w-3 h-3 rounded-full ${t.joiner_confirmed ? "bg-green-500" : "bg-slate-200"}`} />
               <span className="text-sm text-slate-600">
-                {joinerUsername ? `@${joinerUsername} ${t.joiner_confirmed ? "confirmed ✓" : "pending"}` : "Waiting for second party"}
+                {joinerUsername
+                  ? `${roles.payer} @${joinerUsername} ${t.joiner_confirmed ? "confirmed ✓" : "pending"}`
+                  : `Waiting for the ${roles.payer.toLowerCase()}`}
               </span>
             </div>
           </div>

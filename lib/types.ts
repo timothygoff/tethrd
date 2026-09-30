@@ -26,6 +26,22 @@ export const SCENARIO_LABELS: Record<Scenario, string> = {
   service_payment: "Service Payment",
 };
 
+// Display names for the two roles. The joiner pays and the creator gets paid;
+// sales say buyer/seller, services say client/provider.
+export interface RoleLabels {
+  payer: string;
+  payee: string;
+}
+
+const SALE_ROLES: RoleLabels = { payer: "Buyer", payee: "Seller" };
+const SERVICE_ROLES: RoleLabels = { payer: "Client", payee: "Provider" };
+
+export const ROLE_LABELS: Record<Scenario, RoleLabels> = {
+  commitment_hold: SALE_ROLES,
+  two_way_hold: SALE_ROLES,
+  service_payment: SERVICE_ROLES,
+};
+
 export const SCENARIO_DESCRIPTIONS: Record<Scenario, string> = {
   commitment_hold: "One party deposits to secure a meeting. Both confirm after — deposit releases. No-show? Auto-refund.",
   two_way_hold: "Both parties pay in at the same time and we hold both payments. Both confirm — the payments are released. Timer expires — everyone is refunded.",

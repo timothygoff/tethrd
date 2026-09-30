@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import type { Tethrd } from "@/lib/types";
+import { ROLE_LABELS, type Tethrd } from "@/lib/types";
 
 export default function TethrdActions({
   tethrd,
@@ -105,7 +105,7 @@ export default function TethrdActions({
 
       {isCreator && tethrd.status === "pending" && (
         <div className="bg-slate-50 border border-slate-200 rounded-xl px-5 py-4">
-          <p className="text-xs text-slate-500 mb-2 font-medium">Share this link with the other party</p>
+          <p className="text-xs text-slate-500 mb-2 font-medium">Share this link with the {ROLE_LABELS[tethrd.scenario].payer.toLowerCase()}</p>
           <div className="flex items-center gap-3">
             <p className="text-sm text-slate-700 truncate flex-1 font-mono">{`https://www.tethrd.io/tethrd/${tethrd.id}`}</p>
             <button
